@@ -1,4 +1,4 @@
-baseURL = "https://example.com/"
+baseURL = "https://d4sein.github.io/blog/"
 languageCode = "en-us"
 title = "Blog"
 theme = "lekh"
@@ -20,5 +20,5 @@ name = "Goodreads"
 url = "https://www.goodreads.com/user/show/134591540-willian"
 
 [[params.profiles]]
-name = "LinkedIn"
-url = ""
+name = "Youtube"
+url = "https://www.youtube.com/channel/UCBuvdYR8ku9aWoxWgmSZeUA"
