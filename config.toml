@@ -1,24 +1,33 @@
 baseURL = "https://d4sein.github.io/blog/"
 languageCode = "en-us"
-title = "d4sein"
-theme = "lekh"
+title = "Blog"
+theme = "etch"
 
+# Parameters
 [params]
-Name = "d4sein"
-About = "No description. Yet."
-Email = "info@d4sein.dev"
-Resume = "" # Add the filename with file extension.
-PostLimit = 5 # Sets the number of posts to display on the front page
-GoatCounterCode = ""
+    dateFmt = "02.01.2006 15:04"
 
-[[params.profiles]]
-name = "GitHub"
-url = "https://github.com/d4sein"
+# Header
+[menu]
+    [[menu.main]]
+        identifier = "posts"
+        name = "Posts"
+        url = "/posts/"
+        weight = 1
 
-[[params.profiles]]
-name = "Goodreads"
-url = "https://www.goodreads.com/user/show/134591540-willian"
+    [[menu.main]]
+        identifier = "categories"
+        name = "Categories"
+        url = "/categories/"
+        weight = 2
 
-[[params.profiles]]
-name = "Youtube"
-url = "https://www.youtube.com/channel/UCBuvdYR8ku9aWoxWgmSZeUA"
+    [[menu.main]]
+        identifier = "tags"
+        name = "Tags"
+        url = "/tags/"
+        weight = 3
+    [[menu.main]]
+        identifier = "about"
+        name = "About"
+        url = "/about/"
+        weight = 4
