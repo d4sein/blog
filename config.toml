@@ -1,7 +1,7 @@
 baseURL = "https://d4sein.github.io/blog/"
 languageCode = "en-us"
 title = "Blog"
-theme = "paperMod"
+theme = "etch"
 
 # Parameters
 [params]
