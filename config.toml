@@ -1,15 +1,11 @@
 baseURL = "https://d4sein.github.io/blog/"
 languageCode = "en-us"
 title = "Blog"
-theme = "etch"
+theme = "paperMod"
 
 # Parameters
 [params]
     dateFmt = "02.01.2006 15:04"
-
-[taxonomies]
-    category = "categories"
-    tag = "tags"
 
 # Header
 [menu]
