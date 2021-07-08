@@ -1,6 +1,6 @@
 baseURL = "https://d4sein.github.io/blog/"
 title = "Blog"
-theme = "etch"
+theme = "simple-blog"
 languageCode = "en-US"
 enableInlineShortcodes = true
 pygmentsCodeFences = true
