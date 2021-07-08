@@ -16,3 +16,6 @@
 [submodule "themes/paperMod"]
 	path = themes/paperMod
 	url = https://github.com/adityatelange/hugo-PaperMod.git
+[submodule "themes/contrast"]
+	path = themes/contrast
+	url = https://github.com/niklasbuschmann/contrast-hugo.git
