@@ -6,7 +6,7 @@
 	url = https://github.com/EmielH/tale-hugo.git
 [submodule "themes/simple"]
 	path = themes/simple
-	url = https://github.com/yanlinlin82/simple-style.git
+	url = https://github.com/10mohi6/hugo-theme-simple-blog.git
 [submodule "themes/etch"]
 	path = themes/etch
 	url = https://github.com/LukasJoswiak/etch.git
