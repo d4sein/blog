@@ -1,33 +1,49 @@
 baseURL = "https://d4sein.github.io/blog/"
-languageCode = "en-us"
 title = "Blog"
 theme = "etch"
+languageCode = "en-US"
+enableInlineShortcodes = true
+pygmentsCodeFences = true
+pygmentsUseClasses = true
 
-# Parameters
 [params]
-    dateFmt = "02.01.2006 15:04"
+  description = "Your site description"
+  copyright = "Copyright © 2021 d4sein"
+  dark = "auto"
+  highlight = true
 
-# Header
 [menu]
-    [[menu.main]]
-        identifier = "posts"
-        name = "Posts"
-        url = "/posts/"
-        weight = 1
+  [[menu.main]]
+    identifier = "posts"
+    name = "posts"
+    title = "posts"
+    url = "/"
+    weight = 1
 
-    [[menu.main]]
-        identifier = "categories"
-        name = "Categories"
-        url = "/categories/"
-        weight = 2
+  [[menu.main]]
+    identifier = "categories"
+    name = "categories"
+    title = "categories"
+    url = "/categories/"
+    weight = 2
 
-    [[menu.main]]
-        identifier = "tags"
-        name = "Tags"
-        url = "/tags/"
-        weight = 3
-    [[menu.main]]
-        identifier = "about"
-        name = "About"
-        url = "/about/"
-        weight = 4
+  [[menu.main]]
+    identifier = "tags"
+    name = "tags"
+    title = "tags"
+    url = "/tags/"
+    weight = 3
+
+  [[menu.main]]
+    identifier = "about"
+    name = "about"
+    title = "about"
+    url = "/about/"
+    weight = 4
+
+[permalinks]
+  posts = "/:title/"
+
+[markup.goldmark.renderer]
+  # Allows HTML in Markdown
+  unsafe = true

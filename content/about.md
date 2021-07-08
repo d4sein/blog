@@ -1,4 +1,4 @@
-No Decription. Yet.
+No Decryption. Yet.
 
 - [GitHub](https://github.com/d4sein/)
 - [Youtube](https://www.youtube.com/channel/UCBuvdYR8ku9aWoxWgmSZeUA)
