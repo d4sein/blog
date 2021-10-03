@@ -1,12 +1,12 @@
-baseURL = "http://example.org/"
+baseURL = "https://d4sein.github.io/blog/"
 languageCode = "en"
 DefaultContentLanguage = "en"
 enableInlineShortcodes = true
 enableEmoji = true
 # pagination = 10
 
-title = "Hugo"
-author = "Rainer Chiang"
+title = "Blog"
+author = "Willian"
 copyright = "[Home](/) &#183; Theme [Simpleness](https://github.com/RainerChiang/simpleness) Powered by [Hugo](https://gohugo.io/)"
 
 theme = "simpleness"
