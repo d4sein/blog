@@ -19,3 +19,9 @@
 [submodule "themes/contrast"]
 	path = themes/contrast
 	url = https://github.com/niklasbuschmann/contrast-hugo.git
+[submodule "themes/lines"]
+	path = themes/lines
+	url = https://github.com/ronv/lines
+[submodule "themes/simpleness"]
+	path = themes/simpleness
+	url = https://github.com/RainerChiang/simpleness.git

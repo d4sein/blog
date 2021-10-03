@@ -1,49 +1,76 @@
-baseURL = "https://d4sein.github.io/blog/"
-title = "Blog"
-theme = "etch"
-languageCode = "en-US"
+baseURL = "http://example.org/"
+languageCode = "en"
+DefaultContentLanguage = "en"
 enableInlineShortcodes = true
-pygmentsCodeFences = true
-pygmentsUseClasses = true
+enableEmoji = true
+# pagination = 10
+
+title = "Hugo"
+author = "Rainer Chiang"
+copyright = "[Home](/) &#183; Theme [Simpleness](https://github.com/RainerChiang/simpleness) Powered by [Hugo](https://gohugo.io/)"
+
+theme = "simpleness"
+googleAnalytics = ""
 
 [params]
-  description = "Your site description"
-  copyright = "Copyright © 2021 d4sein"
-  dark = "auto"
-  highlight = true
+  lazyImage = true
+  enableMathJax = false # enable it in Front Matter
+  enableReadingTime = true
+  favicon = "favicon.ico"
+  startyear = "2019"
+  showmonth = true
+  slogan = "always make it happen"
+  description = "A simple and concise hugo theme."
+  disqus = ""
+
+[params.valine]
+  enable = false
+  lang = 'en' # zh-CN
+  appId = ''
+  appKey = ''
+  placeholder = 'Say Something......'
+  requiredFields = ['nick', 'mail']
+  avatar = 'robohash'
+  visitor = true
+  enableHeaderVisitor = true
+  debug = true
 
 [menu]
   [[menu.main]]
-    identifier = "posts"
-    name = "posts"
-    title = "posts"
-    url = "/"
-    weight = 1
-
+  name = "Home"
+  url = "/"
+  weight = 1
   [[menu.main]]
-    identifier = "categories"
-    name = "categories"
-    title = "categories"
-    url = "/categories/"
-    weight = 2
-
+  name = "About"
+  url = "/about/"
+  weight = 2
   [[menu.main]]
-    identifier = "tags"
-    name = "tags"
-    title = "tags"
-    url = "/tags/"
-    weight = 3
-
+  name = "Categories"
+  url = "/categories/"
+  weight = 3
   [[menu.main]]
-    identifier = "about"
-    name = "about"
-    title = "about"
-    url = "/about/"
-    weight = 4
+  name = "Tags"
+  url = "/tags/"
+  weight = 4
 
-[permalinks]
-  posts = "/:title/"
+[social]
+  github = "https://github.com/d4sein"
+  rss = "index.xml"
 
-[markup.goldmark.renderer]
-  # Allows HTML in Markdown
-  unsafe = true
+[taxonomies]
+category = "categories"
+tag = "tags"
+
+# doc: https://gohugo.io/getting-started/configuration-markup#highlight
+# syntax style: https://xyproto.github.io/splash/docs/longer/all.html
+[markup]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = false
+    hl_Lines = ""
+    lineNoStart = 1
+    lineNos = false
+    lineNumbersInTable = true
+    noClasses = true
+    style = "dracula" # github, dracula, vim, monokai
+    tabWidth = 4
