@@ -38,7 +38,7 @@ googleAnalytics = ""
 [menu]
   [[menu.main]]
   name = "Home"
-  url = "/blog/"
+  url = "/"
   weight = 1
   [[menu.main]]
   name = "About"
