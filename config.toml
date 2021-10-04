@@ -8,7 +8,7 @@ enableEmoji = true
 title = "Blog"
 author = "Willian Nascimento"
 
-theme = "my-hugo-theme"
+theme = "theme"
 googleAnalytics = ""
 
 [params]
