@@ -1,33 +1,3 @@
-[submodule "themes/lekh"]
-	path = themes/lekh
-	url = https://github.com/ba11b0y/lekh.git
-[submodule "themes/tale"]
-	path = themes/tale
-	url = https://github.com/EmielH/tale-hugo.git
-[submodule "themes/simple"]
-	path = themes/simple
-	url = https://github.com/10mohi6/hugo-theme-simple-blog.git
-[submodule "themes/etch"]
-	path = themes/etch
-	url = https://github.com/LukasJoswiak/etch.git
-[submodule "themes/fuji"]
-	path = themes/fuji
-	url = https://github.com/amzrk2/hugo-theme-fuji.git
-[submodule "themes/paperMod"]
-	path = themes/paperMod
-	url = https://github.com/adityatelange/hugo-PaperMod.git
-[submodule "themes/contrast"]
-	path = themes/contrast
-	url = https://github.com/niklasbuschmann/contrast-hugo.git
-[submodule "themes/lines"]
-	path = themes/lines
-	url = https://github.com/ronv/lines
-[submodule "themes/simpleness"]
-	path = themes/simpleness
-	url = https://github.com/RainerChiang/simpleness.git
-[submodule "themes/my-hugo-theme"]
-	path = themes/my-hugo-theme
-	url = git@github.com:d4sein/my-hugo-theme.git
 [submodule "themes/theme"]
 	path = themes/theme
-	url = git@github.com:d4sein/theme.git
+	url = https://github.com/d4sein/theme.git
