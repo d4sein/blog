@@ -28,3 +28,6 @@
 [submodule "themes/my-hugo-theme"]
 	path = themes/my-hugo-theme
 	url = git@github.com:d4sein/my-hugo-theme.git
+[submodule "themes/theme"]
+	path = themes/theme
+	url = git@github.com:d4sein/theme.git
