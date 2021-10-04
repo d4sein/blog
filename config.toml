@@ -1,15 +1,14 @@
 baseURL = "https://d4sein.github.io/blog/"
 languageCode = "en"
-DefaultContentLanguage = "en"
+DefaultContentLanguage = "ptbr"
 enableInlineShortcodes = true
 enableEmoji = true
 # pagination = 10
 
 title = "Blog"
-author = "Willian"
-copyright = "[Home](/) &#183; Theme [Simpleness](https://github.com/RainerChiang/simpleness) Powered by [Hugo](https://gohugo.io/)"
+author = "Willian Nascimento"
 
-theme = "simpleness"
+theme = "my-hugo-theme"
 googleAnalytics = ""
 
 [params]
@@ -19,21 +18,6 @@ googleAnalytics = ""
   favicon = "favicon.ico"
   startyear = "2019"
   showmonth = true
-  slogan = "always make it happen"
-  description = "A simple and concise hugo theme."
-  disqus = ""
-
-[params.valine]
-  enable = false
-  lang = 'en' # zh-CN
-  appId = ''
-  appKey = ''
-  placeholder = 'Say Something......'
-  requiredFields = ['nick', 'mail']
-  avatar = 'robohash'
-  visitor = true
-  enableHeaderVisitor = true
-  debug = true
 
 [menu]
   [[menu.main]]
@@ -54,7 +38,7 @@ googleAnalytics = ""
   weight = 4
 
 [social]
-  github = "https://github.com/d4sein"
+  github = "https://github.com/d4sein/"
   rss = "index.xml"
 
 [taxonomies]
