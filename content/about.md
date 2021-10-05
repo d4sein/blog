@@ -1,24 +1,17 @@
 ---
 title: About
-date: 2020-09-22T10:37:58+05:30
-lastmod: 
-author: Rainer Chiang
+date: 2021-10-04T21:44:25-03:00
+author: Willian Nascimento
 
-description: 
+description: About myself
 categories: []
 tags: []
 
 draft: false
-enableDisqus : true
+enableDisqus: false
 enableMathJax: false
 disableToC: false
 disableAutoCollapse: true
 ---
 
-## About Yourself
-
-This is some static page where you can write about yourself.
-
-## hugo theme [simpleness](https://github.com/RainerChiang/simpleness)
-
-A hugo theme ported form [contrast-hugo](https://github.com/niklasbuschmann/contrast-hugo)
+## About Myself
