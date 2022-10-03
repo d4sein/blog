@@ -1,11 +1,11 @@
 baseURL = "https://d4sein.github.io/blog/"
 languageCode = "en"
-DefaultContentLanguage = "ptbr"
+DefaultContentLanguage = "en"
 enableInlineShortcodes = true
 enableEmoji = true
 # pagination = 10
 
-title = "Blog"
+title = "d4sein"
 author = "Willian Nascimento"
 
 theme = "theme"

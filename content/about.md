@@ -1,9 +1,9 @@
 ---
-title: About
+title: About Me
 date: 2021-10-04T21:44:25-03:00
 author: Willian Nascimento
 
-description: About myself
+description: About Me
 categories: []
 tags: []
 
@@ -14,4 +14,4 @@ disableToC: false
 disableAutoCollapse: true
 ---
 
-## About Myself
+A work in progress..
