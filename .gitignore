@@ -1,6 +1,9 @@
 # Deploy
 /public
 
+# Rascunhos
+rascunhos.txt
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
