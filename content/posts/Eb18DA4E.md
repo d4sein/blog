@@ -5,7 +5,7 @@ lastmod: 2023-07-23T19:38:30-03:00
 draft: false
 author: Willian Nascimento
 
-description: Some description I haven't thought of yet
+description: Introducing domain-driven design to a frontend application
 categories: [Programming]
 tags: [English]
 ---
