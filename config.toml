@@ -19,6 +19,10 @@ googleAnalytics = ""
   startyear = "2019"
   showmonth = true
 
+[params.social]
+  github = "https://github.com/d4sein/"
+  rss = "index.xml"
+
 [menu]
   [[menu.main]]
   name = "Home"
@@ -36,10 +40,6 @@ googleAnalytics = ""
   name = "Tags"
   url = "/tags/"
   weight = 4
-
-[social]
-  github = "https://github.com/d4sein/"
-  rss = "index.xml"
 
 [taxonomies]
 category = "categories"

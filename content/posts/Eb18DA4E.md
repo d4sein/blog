@@ -2,15 +2,16 @@
 title: Introducing domain-driven design to a frontend application
 date: 2023-05-07T19:29:57-03:00
 lastmod: 2023-07-23T19:38:30-03:00
-draft: false
 author: Willian Nascimento
 
 description: Introducing domain-driven design to a frontend application
 categories: [Programming]
 tags: [English]
+
+draft: false
 ---
 
-After delving into our React.js project at work, experiencing the mysterious ways in which it was built and grappling with the unintended consequences of poor decisions, we decided it was time to shake things up a bit.
+After diving into our React.js project at work, experiencing the mysterious ways in which it was built and grappling with the unintended consequences of poor decisions, we decided it was time to shake things up a bit.
 
 Changes were necessary, and the first major one we implemented was transitioning from Javascript to Typescript. Typescript is a strongly and statically typed language, it allows developers to define types for variables, functions and objects, which helps catch type-related errors during development. It also has neat features like discriminated unions; with them, it's possible to represent a value that can take on different types.
 
