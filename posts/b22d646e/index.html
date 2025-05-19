@@ -1,101 +1,27 @@
-<!doctype html><html lang=en>
-<head>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<meta name=generator content="Hugo 0.91.2">
-<title> Exhaustive pattern matching in C# | dasein </title>
-<meta name=description content="Demonstration of a setup to make C#'s pattern match exhaustive">
-<link rel=stylesheet href=https://dasein.dev/css/style.css>
-<link rel=canonical href=https://dasein.dev/posts/b22d646e/>
-<link rel=alternate type=application/rss+xml href title=dasein>
-<link href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css rel=stylesheet>
-</head>
-<body class=container>
-<nav class=navigation>
-<div class=nav-left>
-<div class="nav-item nav-title">
-<a href=https://dasein.dev/> dasein</a>
-</div>
-<div class="nav-item nav-menu">
-<a href=/> Home</a>
-<a href=/about/> About</a>
-<a href=/categories/> Categories</a>
-<a href=/tags/> Tags</a>
-</div>
-</div>
-<div class="nav-item nav-right fontawesome">
-<a href=https://github.com/d4sein/ target=_blank>
-<i title=GitHub class="fab fa-github"></i>
-</a>
-<a href=https://dasein.dev/index.xml target=_blank>
-<i title=RSS class="fas fa-rss"></i>
-</a>
-</div>
-</nav>
-<article class=post>
-<header class=post-header>
-<h1 style=text-align:center>Exhaustive pattern matching in C#</h1>
-<div class=post-metadata>
-<time datetime=2024-06-15T17:47:14-03:00>June 15, 2024</time> &nbsp;
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=generator content="Hugo 0.147.3"><title>Exhaustive pattern matching in C# | dasein </title><meta name=description content="Demonstration of a setup to make C#'s pattern match exhaustive"><link rel=stylesheet href=https://dasein.dev/css/style.css><link rel=canonical href=https://dasein.dev/posts/b22d646e/><link rel=alternate type=application/rss+xml href title=dasein><link href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css rel=stylesheet></head><body class=container><nav class=navigation><div class=nav-left><div class="nav-item nav-title"><a href=https://dasein.dev/>dasein</a></div><div class="nav-item nav-menu"><a href=/>Home</a>
+<a href=/about/>About</a>
+<a href=/categories/>Categories</a>
+<a href=/tags/>Tags</a></div></div><div class="nav-item nav-right fontawesome"><a href=https://github.com/d4sein/ target=_blank><i title=GitHub class="fab fa-github"></i>
+</a><a href=https://dasein.dev/index.xml target=_blank><i title=RSS class="fas fa-rss"></i></a></div></nav><article class=post><header class=post-header><h1 style=text-align:center>Exhaustive pattern matching in C#</h1><div class=post-metadata><time datetime=2024-06-15T17:47:14-03:00>June 15, 2024</time> &nbsp;
 <i class="far fa-clock"></i>
 52 s
 &nbsp;
 <i class="fas fa-folder"></i>
 <a href=/categories/programming>Programming</a>
-&nbsp;
-</div>
-</header>
-<div class=post-text>
-<p><img src=/../imgs/roman_pantheon.jpg alt></p>
-<p>Although C# has assimilated many functional features along the years, its framework is still mostly imperative and object-oriented; things like switch statements and switch expressions haven&rsquo;t adopted a safer and more consistent behavior, giving leeway to unwarranted flexibility.</p>
-<p>That said, it&rsquo;s pretty simple to add this behavior to your project through the EditorConfig. Just be careful, as these settings change only the development environment!</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=color:#ff79c6>[*.cs]</span>
-
-<span style=color:#6272a4># CS8509: The switch expression does not handle all possible values of its input type (it is not exhaustive).</span>
-<span style=color:#50fa7b>dotnet_diagnostic.CS8509.severity</span> <span style=color:#ff79c6>=</span> <span style=color:#f1fa8c>error</span>
-
-<span style=color:#6272a4># CS8524: The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.</span>
-<span style=color:#50fa7b>dotnet_diagnostic.CS8524.severity</span> <span style=color:#ff79c6>=</span> <span style=color:#f1fa8c>none</span>
-</code></pre></div><ul>
-<li>For <strong>CS8509</strong>, set the severity to <code>error</code>. This ensures that the code won&rsquo;t compile without the switch handling all possible values.</li>
-<li>For <strong>CS8524</strong>, set the severity to <code>none</code>. This is important because any default case will automatically cover any missing values, which would render the first setting useless.</li>
-</ul>
-<p>Unfortunately, I&rsquo;m unaware of a setting that will error out if you <strong>do use</strong> a default case, but you can solve that by adding a code analyzer, if you want.</p>
-</div>
-<footer class=post-footer>
-<div class=post-tags>
-<i class="fas fa-tags"></i>
+&nbsp;</div></header><div class=post-text><p><img src=/../imgs/roman_pantheon.jpg alt></p><p>Although C# has assimilated many functional features along the years, its framework is still mostly imperative and object-oriented; things like switch statements and switch expressions haven&rsquo;t adopted a safer and more consistent behavior, giving leeway to unwarranted flexibility.</p><p>That said, it&rsquo;s pretty simple to add this behavior to your project through the EditorConfig. Just be careful, as these settings change only the development environment!</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#ff79c6>[*.cs]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># CS8509: The switch expression does not handle all possible values of its input type (it is not exhaustive).</span>
+</span></span><span style=display:flex><span><span style=color:#50fa7b>dotnet_diagnostic.CS8509.severity</span> <span style=color:#ff79c6>=</span> <span style=color:#f1fa8c>error</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># CS8524: The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.</span>
+</span></span><span style=display:flex><span><span style=color:#50fa7b>dotnet_diagnostic.CS8524.severity</span> <span style=color:#ff79c6>=</span> <span style=color:#f1fa8c>none</span>
+</span></span></code></pre></div><ul><li>For <strong>CS8509</strong>, set the severity to <code>error</code>. This ensures that the code won&rsquo;t compile without the switch handling all possible values.</li><li>For <strong>CS8524</strong>, set the severity to <code>none</code>. This is important because any default case will automatically cover any missing values, which would render the first setting useless.</li></ul><p>Unfortunately, I&rsquo;m unaware of a setting that will error out if you <strong>do use</strong> a default case, but you can solve that by adding a code analyzer, if you want.</p></div><footer class=post-footer><div class=post-tags><i class="fas fa-tags"></i>
 <a href=/tags/english>English</a>
-&nbsp;
-</div>
-<div class=related-posts>
-<h4>Related Posts</h4>
-<i class="fas fa-paperclip"></i>
-<a href=/posts/409fe13d/>My introduction to Euclid's Elements: Book I</a>
-<br>
-<i class="fas fa-paperclip"></i>
-<a href=/posts/e9c2ce81/>Wrapping C# types with actual domain specific knowledge</a>
-<br>
-<i class="fas fa-paperclip"></i>
-<a href=/posts/eb18da4e/>Introducing domain-driven design to a frontend application</a>
-<br>
-<i class="fas fa-paperclip"></i>
-<a href=/posts/8a79bd9f/>An insight into beautiful code</a>
-<br>
-</div>
-</footer>
-<div class=comments>
-<div class=comments>
-</div>
-</div>
-</article>
-<div class=foot>
-&copy; 2019 - 2025 &#183;
-<a href=/> dasein </a> &#183;
+&nbsp;</div><div class=related-posts><h4>Related Posts</h4><i class="fas fa-paperclip"></i>
+<a href=/posts/409fe13d/>My introduction to Euclid's Elements: Book I</a><br><i class="fas fa-paperclip"></i>
+<a href=/posts/e9c2ce81/>Wrapping C# types with actual domain specific knowledge</a><br><i class="fas fa-paperclip"></i>
+<a href=/posts/eb18da4e/>Introducing domain-driven design to a frontend application</a><br><i class="fas fa-paperclip"></i>
+<a href=/posts/8a79bd9f/>An insight into beautiful code</a><br></div></footer><div class=comments><div class=comments></div></div></article><div class=foot>&copy; 2019 - 2025 &#183;
+<a href=/>dasein </a>&#183;
 Powered by <a href=https://gohugo.io/>Hugo</a> &#183;
-<a href=#><i class="fas fa-chevron-up"></i></a>
-</div>
-</body>
-<script src=/js/lazyload.min.js></script>
-<script>var lazyImage=new LazyLoad({container:document.getElementById('article')})</script>
-</html>
+<a href=#><i class="fas fa-chevron-up"></i></a></div></body><script src=/js/lazyload.min.js></script><script>var lazyImage=new LazyLoad({container:document.getElementById("article")})</script></html>

@@ -1,319 +1,225 @@
-<!doctype html><html lang=en>
-<head>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<meta name=generator content="Hugo 0.91.2">
-<title> Introducing domain-driven design to a frontend application | dasein </title>
-<meta name=description content="Introducing domain-driven design to a frontend application">
-<link rel=stylesheet href=https://dasein.dev/css/style.css>
-<link rel=canonical href=https://dasein.dev/posts/eb18da4e/>
-<link rel=alternate type=application/rss+xml href title=dasein>
-<link href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css rel=stylesheet>
-</head>
-<body class=container>
-<nav class=navigation>
-<div class=nav-left>
-<div class="nav-item nav-title">
-<a href=https://dasein.dev/> dasein</a>
-</div>
-<div class="nav-item nav-menu">
-<a href=/> Home</a>
-<a href=/about/> About</a>
-<a href=/categories/> Categories</a>
-<a href=/tags/> Tags</a>
-</div>
-</div>
-<div class="nav-item nav-right fontawesome">
-<a href=https://github.com/d4sein/ target=_blank>
-<i title=GitHub class="fab fa-github"></i>
-</a>
-<a href=https://dasein.dev/index.xml target=_blank>
-<i title=RSS class="fas fa-rss"></i>
-</a>
-</div>
-</nav>
-<article class=post>
-<header class=post-header>
-<h1 style=text-align:center>Introducing domain-driven design to a frontend application</h1>
-<div class=post-metadata>
-<time datetime=2023-05-07T19:29:57-03:00>May 07, 2023</time> &nbsp;
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=generator content="Hugo 0.147.3"><title>Introducing domain-driven design to a frontend application | dasein </title><meta name=description content="Introducing domain-driven design to a frontend application"><link rel=stylesheet href=https://dasein.dev/css/style.css><link rel=canonical href=https://dasein.dev/posts/eb18da4e/><link rel=alternate type=application/rss+xml href title=dasein><link href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css rel=stylesheet></head><body class=container><nav class=navigation><div class=nav-left><div class="nav-item nav-title"><a href=https://dasein.dev/>dasein</a></div><div class="nav-item nav-menu"><a href=/>Home</a>
+<a href=/about/>About</a>
+<a href=/categories/>Categories</a>
+<a href=/tags/>Tags</a></div></div><div class="nav-item nav-right fontawesome"><a href=https://github.com/d4sein/ target=_blank><i title=GitHub class="fab fa-github"></i>
+</a><a href=https://dasein.dev/index.xml target=_blank><i title=RSS class="fas fa-rss"></i></a></div></nav><article class=post><header class=post-header><h1 style=text-align:center>Introducing domain-driven design to a frontend application</h1><div class=post-metadata><time datetime=2023-05-07T19:29:57-03:00>May 07, 2023</time> &nbsp;
 <i class="far fa-clock"></i>
 6 min
 47 s
 &nbsp;
 <i class="fas fa-folder"></i>
 <a href=/categories/programming>Programming</a>
-&nbsp;
-</div>
-</header>
-<div class=post-text>
-<p>After delving into our React.js project at work, experiencing the mysterious ways in which it was built and grappling with the unintended consequences of poor decisions, we decided it was time to shake things up a bit.</p>
-<p>Changes were necessary, and the first major one we implemented was transitioning from Javascript to Typescript. Typescript is a strongly and statically typed language, it allows developers to define types for variables, functions and objects, which helps catch type-related errors during development. It also has neat features like discriminated unions; with them, it&rsquo;s possible to represent a value that can take on different types.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=color:#6272a4>// For representing entity validity
-</span><span style=color:#6272a4></span><span style=color:#ff79c6>type</span> Entity <span style=color:#ff79c6>=</span>
-	<span style=color:#ff79c6>|</span> UnverifiedEntity
-	<span style=color:#ff79c6>|</span> ValidEntity
-
-<span style=color:#6272a4>// For representing state machines
-</span><span style=color:#6272a4></span><span style=color:#ff79c6>type</span> State <span style=color:#ff79c6>=</span>
-	<span style=color:#ff79c6>|</span> Uninitialized
-	<span style=color:#ff79c6>|</span> Processing
-	<span style=color:#ff79c6>|</span> Finished
-	<span style=color:#ff79c6>|</span> WithError
-</code></pre></div><p><em>But anyways, lets go back to the main topic..</em></p>
-<p>Our goal was to make the transition gradual, easy to understand, and capable of releasing small, well-contained migrations in production. Moving to Typescript was a game-changer and led the team towards safer and better-structured code. It became the driving theme for other improvements, including the adoption of domain-driven design.</p>
-<p>I plan to write on domain-centric solutions alone, so I&rsquo;m not going in depth about it here, but in summary, it centralizes the development around it, using cool ideas such as bringing domain experts and developers close together using a common language, plus other stuff like bounded contexts.</p>
-<p>At the time we didn&rsquo;t realize how impactful this would be, and the challenges that came with it.</p>
-<p>Initially we split the project into different layers, this was important for separation of concerns. We had the Domain for views, models, dtos and mappers. The Infrastructure handled repositories, helpers and utils. The Application had basically the React screens and hooks.</p>
-<p>However, instead of creating a Service layer, which is common in this type of layered architecture, we divided the screens into different files. The primary ones were Screen.tsx for HTML components, and ScreenService.tsx, a kind of hook/context provider that acted much like a service, orchestrating the flow. This gave us some flexibility and made maintenance easier.</p>
-<blockquote>
-<p>It&rsquo;s worth noting that the general design applied here is a mix of different patterns and, as such, does not concern itself with architectural purity or anything of the sort. DDD ultimately means the application is Domain-centric.</p>
-</blockquote>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-md data-lang=md><span style=font-weight:700># inside ./src
-</span><span style=font-weight:700></span>├── domain
-	├── models
-	├── dtos
-	├── views
-	└── mappers
-├── infrastructure
-	├── api
-	└── utils
-└── application
-	└──  order
-		├── components
-		├── Order.tsx
-		└── OrderService.tsx
-</code></pre></div><p>Second, we had to figure out how to write code that would allow for a smooth interaction between types from different layers. It&rsquo;s a bit different when you apply these concepts to the frontend, and some adjustments had to be made.</p>
-<p>In essence, view types are flexible and used to hold user inputs; validation logic can usually be found close to them. Dto types are similar to view types, and serve as the contract between the application and external sources when fetching or sending data.</p>
-<p>For these two layers to have a healthy interaction with the domain (in our case, at least), it was necessary to provide functionality to enable flows that need not the domain, to work seemlessly. Meaning, the creation of a new resource that has been validated already in the view layer, to be sent to the backend without friction.</p>
-<p>&mldr;In any case, we arrived at something similar to this:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=color:#6272a4>// Unique symbol used to make the construction of valid types impossible
-</span><span style=color:#6272a4>// without using the proper `validate` function.
-</span><span style=color:#6272a4></span><span style=color:#ff79c6>const</span> modalitySymbol <span style=color:#ff79c6>=</span> Symbol(<span style=color:#f1fa8c>&#34;Modality&#34;</span>);
-
-<span style=color:#ff79c6>type</span> Modality <span style=color:#ff79c6>=</span> {
-	[modalitySymbol]<span style=color:#ff79c6>:</span> <span style=color:#ff79c6>true</span> <span style=color:#6272a4>// the value here doesn&#39;t matter
-</span><span style=color:#6272a4></span>	name: <span style=color:#8be9fd>string</span>
-	id: <span style=color:#8be9fd>string</span>
-}
-
-<span style=color:#8be9fd;font-style:italic>function</span> createModality(modality: <span style=color:#8be9fd>ModalityDto</span>)<span style=color:#ff79c6>:</span> Modality {
-	<span style=color:#ff79c6>if</span> (modality.id <span style=color:#ff79c6>===</span> <span style=color:#ff79c6>undefined</span> <span style=color:#ff79c6>||</span> modality.id.trim().length <span style=color:#ff79c6>===</span> <span style=color:#bd93f9>0</span>)
-		<span style=color:#ff79c6>throw</span> <span style=color:#ff79c6>new</span> ValidationError({message: <span style=color:#8be9fd>ErrorMessages.cannotBeNullOrEmpty</span>(<span style=color:#f1fa8c>&#34;id&#34;</span>)})
-
-	<span style=color:#ff79c6>return</span> {
-		[modalitySymbol]<span style=color:#ff79c6>:</span> <span style=color:#ff79c6>true</span>,
-		id: <span style=color:#8be9fd>modality.id</span>,
-		name: <span style=color:#8be9fd>modality.name</span>,
-	}
-}
-
-<span style=color:#6272a4>// Exporting types and funcs at the end of the file
-</span><span style=color:#6272a4>// instead of using `export` in their definition is good for readability,
-</span><span style=color:#6272a4>// but also to avoid circular dependencies between modules.
-</span><span style=color:#6272a4></span><span style=color:#ff79c6>export</span> <span style=color:#ff79c6>type</span> { Modality }
-<span style=color:#ff79c6>export</span> { createModality }
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=color:#ff79c6>type</span> ModalityDto <span style=color:#ff79c6>=</span> {
-	id?: <span style=color:#8be9fd>string</span>;
-	name: <span style=color:#8be9fd>string</span>;
-};
-
-<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>type</span> { ModalityDto };
-</code></pre></div><p>The mappers were written separately. We implemented mostly functions that mapped between domain and dto types. Some were also created to map from a view type to a dto (related to the necessity to avoid friction I mentioned earlier).</p>
-<p>And mind you, this solution was practical, it allowed us to move forward with the changes, but there&rsquo;s still some polishing to do. I would like to achieve an organization similar to F# modules, something like this:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=color:#ff79c6>namespace</span> Modality {
-	<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>namespace</span> Domain {
-		<span style=color:#6272a4>// Unique symbol used to make the construction of valid types impossible
-</span><span style=color:#6272a4></span>		<span style=color:#6272a4>// without using the proper `validate` function.
-</span><span style=color:#6272a4></span>		<span style=color:#ff79c6>const</span> modalitySymbol <span style=color:#ff79c6>=</span> Symbol(<span style=color:#f1fa8c>&#34;Modality&#34;</span>);
-		
-		<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>type</span> Modality <span style=color:#ff79c6>=</span> {
-			[modalitySymbol]<span style=color:#ff79c6>:</span> <span style=color:#ff79c6>true</span> <span style=color:#6272a4>// the value here doesn&#39;t matter
-</span><span style=color:#6272a4></span>			name: <span style=color:#8be9fd>string</span>
-			id: <span style=color:#8be9fd>string</span>
-		}
-	
-		<span style=color:#ff79c6>export</span> <span style=color:#8be9fd;font-style:italic>function</span> create(modality: <span style=color:#8be9fd>Dto.Modality</span>)<span style=color:#ff79c6>:</span> Modality {
-			<span style=color:#ff79c6>if</span> (modality.id <span style=color:#ff79c6>===</span> <span style=color:#ff79c6>undefined</span> <span style=color:#ff79c6>||</span> modality.id.trim().length <span style=color:#ff79c6>===</span> <span style=color:#bd93f9>0</span>)
-				<span style=color:#ff79c6>throw</span> <span style=color:#ff79c6>new</span> ValidationError({message: <span style=color:#8be9fd>ErrorMessages.cannotBeNullOrEmpty</span>(<span style=color:#f1fa8c>&#34;id&#34;</span>)})
-	
-			<span style=color:#ff79c6>return</span> {
-				[modalitySymbol]<span style=color:#ff79c6>:</span> <span style=color:#ff79c6>true</span>,
-				id: <span style=color:#8be9fd>modality.id</span>,
-				name: <span style=color:#8be9fd>modality.name</span>,
-			}
-		}
-	}
-
-	<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>namespace</span> View {
-		<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>type</span> Modality <span style=color:#ff79c6>=</span> {
-			name?: <span style=color:#8be9fd>string</span>
-			id?: <span style=color:#8be9fd>string</span>
-		}
-
-		<span style=color:#ff79c6>export</span> <span style=color:#8be9fd;font-style:italic>function</span> toModel(modality: <span style=color:#8be9fd>Modality</span>) {}
-
-		<span style=color:#ff79c6>export</span> <span style=color:#8be9fd;font-style:italic>function</span> ofModel(modality: <span style=color:#8be9fd>Domain.Modality</span>) {}
-	}
-
-	<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>namespace</span> Dto {
-		<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>type</span> Modality <span style=color:#ff79c6>=</span> {
-			name: <span style=color:#8be9fd>string</span>
-			id?: <span style=color:#8be9fd>string</span>
-		}
-
-		<span style=color:#ff79c6>export</span> <span style=color:#8be9fd;font-style:italic>function</span> toModel(modality: <span style=color:#8be9fd>Modality</span>) {}
-
-		<span style=color:#ff79c6>export</span> <span style=color:#8be9fd;font-style:italic>function</span> ofModel(modality: <span style=color:#8be9fd>Domain.Modality</span>) {}
-	}
-}
-
-<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>default</span> Modality
-</code></pre></div><p>Having finished modeling the domain and other value object types, we were ready to design the repositories. For this purpose, we used OOP (<em>object oriented programming</em>) to define a base class responsible for implementing the essential code for communicating with the backend.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=color:#ff79c6>export</span> <span style=color:#ff79c6>default</span> <span style=color:#ff79c6>abstract</span> <span style=color:#ff79c6>class</span> BaseApi {
-	<span style=color:#ff79c6>constructor</span>(apiAddress: <span style=color:#8be9fd>string</span>) {
-		<span style=color:#ff79c6>this</span>.baseUrl <span style=color:#ff79c6>=</span> GetDomain() <span style=color:#ff79c6>+</span> apiAddress;
-	}
-
-	<span style=color:#ff79c6>private</span> <span style=color:#ff79c6>readonly</span> baseUrl: <span style=color:#8be9fd>string</span>;
-
-	<span style=color:#ff79c6>protected</span> isResponseSuccessful(statusCode: <span style=color:#8be9fd>number</span>) {
-		<span style=color:#ff79c6>if</span> ([<span style=color:#bd93f9>200</span>, <span style=color:#bd93f9>201</span>, <span style=color:#bd93f9>202</span>, <span style=color:#bd93f9>204</span>, <span style=color:#bd93f9>206</span>].includes(statusCode))
-			<span style=color:#ff79c6>return</span> <span style=color:#ff79c6>true</span>;
-
-		<span style=color:#ff79c6>return</span> <span style=color:#ff79c6>false</span>;
-	}
-
-	<span style=color:#ff79c6>protected</span> <span style=color:#ff79c6>async</span> request&lt;<span style=color:#ff79c6>T</span>&gt;(
-		uri: <span style=color:#8be9fd>string</span>,
-		method: <span style=color:#8be9fd>HttpMethod</span>,
-		body: <span style=color:#8be9fd>object</span> <span style=color:#ff79c6>|</span> <span style=color:#ff79c6>null</span> <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>null</span>
-	)<span style=color:#ff79c6>:</span> Promise&lt;<span style=color:#ff79c6>AxiosResponse</span>&lt;<span style=color:#50fa7b>T</span>&gt;<span style=color:#ff79c6>&gt;</span> {
-		<span style=color:#8be9fd;font-style:italic>let</span> req: <span style=color:#8be9fd>AxiosRequestConfig</span> <span style=color:#ff79c6>=</span> {
-			baseURL: <span style=color:#8be9fd>this.baseUrl</span>,
-			url: <span style=color:#8be9fd>uri</span>,
-			method: <span style=color:#8be9fd>method</span>,
-			headers<span style=color:#ff79c6>:</span> {}, <span style=color:#6272a4>// auth here if any
-</span><span style=color:#6272a4></span>			data: <span style=color:#8be9fd>body</span> <span style=color:#ff79c6>===</span> <span style=color:#ff79c6>null</span> <span style=color:#ff79c6>?</span> <span style=color:#ff79c6>null</span> <span style=color:#ff79c6>:</span> JSON.stringify(body),
-		};
-
-		<span style=color:#8be9fd;font-style:italic>let</span> resp: <span style=color:#8be9fd>AxiosResponse</span>&lt;<span style=color:#ff79c6>T</span>&gt;;
-		<span style=color:#ff79c6>try</span> {
-			resp <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>await</span> Axios.request&lt;<span style=color:#ff79c6>T</span>&gt;(req);
-		} <span style=color:#ff79c6>catch</span> (err: <span style=color:#8be9fd>unknown</span>) {
-			<span style=color:#8be9fd;font-style:italic>let</span> axiosError <span style=color:#ff79c6>=</span> err <span style=color:#ff79c6>as</span> AxiosError&lt;<span style=color:#ff79c6>T</span>&gt;;
-			<span style=color:#ff79c6>if</span> (
-				axiosError<span style=color:#ff79c6>?</span>.isAxiosError <span style=color:#ff79c6>&amp;&amp;</span>
-				axiosError<span style=color:#ff79c6>?</span>.response <span style=color:#ff79c6>!==</span> <span style=color:#ff79c6>null</span> <span style=color:#ff79c6>&amp;&amp;</span>
-				axiosError<span style=color:#ff79c6>?</span>.response <span style=color:#ff79c6>!==</span> <span style=color:#ff79c6>undefined</span>
-			) {
-				resp <span style=color:#ff79c6>=</span> axiosError.response;
-				<span style=color:#ff79c6>return</span> resp;
-			}
-
-			<span style=color:#6272a4>// Rethrow error up the stack, we don&#39;t want to catch here
-</span><span style=color:#6272a4></span>			<span style=color:#6272a4>// because there are no errors expected besides AxiosError.
-</span><span style=color:#6272a4></span>			<span style=color:#ff79c6>throw</span> err;
-		}
-
-		<span style=color:#ff79c6>return</span> resp;
-	}
-}
-</code></pre></div><p>Then, we inherited the BaseApi for any of our APIs.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=color:#ff79c6>interface</span> ISomeApi {
-    getSomethingById<span style=color:#ff79c6>:</span> (id: <span style=color:#8be9fd>string</span>) <span style=color:#ff79c6>=&gt;</span> Promise&lt;<span style=color:#ff79c6>SomethingDto</span>&gt;;
-}
-
-<span style=color:#ff79c6>class</span> SomeApi <span style=color:#ff79c6>extends</span> BaseApi <span style=color:#ff79c6>implements</span> ISomeApi {
-    <span style=color:#ff79c6>async</span> getSomethingById(id: <span style=color:#8be9fd>string</span>)<span style=color:#ff79c6>:</span> Promise&lt;<span style=color:#ff79c6>SomethingDto</span>&gt; {
-        <span style=color:#8be9fd;font-style:italic>let</span> resp <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>await</span> <span style=color:#ff79c6>this</span>.request&lt;<span style=color:#ff79c6>SomethingDto</span>&gt;(<span style=color:#f1fa8c>`something/</span><span style=color:#f1fa8c>${</span>id<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>`</span>, HttpMethod.Get);
-        
-        <span style=color:#ff79c6>if</span> (<span style=color:#ff79c6>!</span><span style=color:#ff79c6>this</span>.isResponseSuccessful(resp.status))
-            <span style=color:#ff79c6>throw</span> <span style=color:#ff79c6>new</span> <span style=color:#8be9fd;font-style:italic>Error</span>(<span style=color:#f1fa8c>&#34;Could not get something by id.&#34;</span>);
-
-        <span style=color:#ff79c6>return</span> resp.data;
-    }
-}
-
-<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>const</span> someApi: <span style=color:#8be9fd>ISomeApi</span> <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>new</span> SomeApi(<span style=color:#f1fa8c>&#34;api/&#34;</span>);
-</code></pre></div><p>I&rsquo;m still debating on whether we should have written the repositories in the same namespaces as the domain entities, creating nice bounded contexts, or if the application would struggle to handle such tight structures.</p>
-<p>Anyhow, that can change in the future.</p>
-<p>With the Infrastructure layer now in place, we could finally wrap it all up in the services. These services would be responsible for orchestrating the flow of data and business logic between the user interface and the repositories.</p>
-<p>Here&rsquo;s an example of service, which in our case is just a React hook:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=color:#ff79c6>export</span> <span style=color:#ff79c6>default</span> <span style=color:#8be9fd;font-style:italic>function</span> someService() {
-	<span style=color:#ff79c6>const</span> [something, setSomething] <span style=color:#ff79c6>=</span> useState&lt;<span style=color:#ff79c6>SomethingView</span>&gt;({});
-	
-	useEffect(() <span style=color:#ff79c6>=&gt;</span> {
-		getSomething(sellerId);
-	}, []);
-
-	<span style=color:#ff79c6>const</span> getSomething <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>async</span> (id: <span style=color:#8be9fd>string</span>)<span style=color:#ff79c6>:</span> Promise&lt;<span style=color:#ff79c6>void</span>&gt; <span style=color:#ff79c6>=&gt;</span> {
-		setIsLoading(<span style=color:#ff79c6>true</span>);
-
-		<span style=color:#ff79c6>try</span> {
-			<span style=color:#8be9fd;font-style:italic>let</span> data: <span style=color:#8be9fd>SomethingDto</span> <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>await</span> someApi.getSomethingById(id);
-			<span style=color:#8be9fd;font-style:italic>let</span> domainObj <span style=color:#ff79c6>=</span> createModality(data);
-			<span style=color:#6272a4>// Do some business logic here using domainObj..
-</span><span style=color:#6272a4></span>			<span style=color:#8be9fd;font-style:italic>let</span> viewObj <span style=color:#ff79c6>=</span> ModalityMapper.toView(domainObj);
-			setModalities(viewObj);
-		} <span style=color:#ff79c6>catch</span> {
-			ToastComponent({
-				status<span style=color:#ff79c6>:</span> <span style=color:#f1fa8c>&#34;error&#34;</span>,
-				title<span style=color:#ff79c6>:</span> <span style=color:#f1fa8c>&#34;Some error :(&#34;</span>,
-				message<span style=color:#ff79c6>:</span> <span style=color:#f1fa8c>&#34;Something could not be loaded&#34;</span>,
-			});
-		}
-
-		setTimeout(() <span style=color:#ff79c6>=&gt;</span> {
-			setIsLoading(<span style=color:#ff79c6>false</span>);
-		}, <span style=color:#bd93f9>500</span>);
-	};
-
-	<span style=color:#ff79c6>return</span> {
-		<span style=color:#6272a4>// Props
-</span><span style=color:#6272a4></span>		something,
-		isLoading,
-		<span style=color:#6272a4>// Functions
-</span><span style=color:#6272a4></span>		getSomething,
-	};
-}
-</code></pre></div><p>At this point I&rsquo;ve summarized pretty much all the relevant events, and omitted many of others, like our attempts to use external packages to validate forms, which we didn&rsquo;t enjoy very much, and the migration from bootstrap to MUI; but those are reserved for another day..</p>
-<p>For now, that&rsquo;s what I have to share about introducing domain-driven design to a frontend application.</p>
-<hr>
-<p>As for the results that blossomed from this adventure, I can&rsquo;t share much in details, but there&rsquo;s one that is special to me. The amount of bugs that were escalated for fix, which were noticeable previously to these changes, have now resumed in, believe it or not, zero (statistics from the three months after first release in production).</p>
-<p>In conclusion, transitioning from Javascript to Typescript, as well as writing code driven by the domain, have provided just enough strictness to create a safer, faster, and more enjoyable development cycle for the frontend team. It was an extremely enriching and rewarding experience, and I recommend other teams to dare explore!</p>
-</div>
-<footer class=post-footer>
-<div class=post-lastmod>
-<time datetime=2023-07-23T19:38:30-03:00>
-update @ July 23, 2023
-</time>
-<p></p>
-</div>
-<div class=post-tags>
-<i class="fas fa-tags"></i>
+&nbsp;</div></header><div class=post-text><p>After diving into our React.js project at work, experiencing the mysterious ways in which it was built and grappling with the unintended consequences of poor decisions, we decided it was time to shake things up a bit.</p><p>Changes were necessary, and the first major one we implemented was transitioning from Javascript to Typescript. Typescript is a strongly and statically typed language, it allows developers to define types for variables, functions and objects, which helps catch type-related errors during development. It also has neat features like discriminated unions; with them, it&rsquo;s possible to represent a value that can take on different types.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=display:flex><span><span style=color:#6272a4>// For representing entity validity
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>type</span> Entity <span style=color:#ff79c6>=</span>
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>|</span> UnverifiedEntity
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>|</span> ValidEntity
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>// For representing state machines
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>type</span> State <span style=color:#ff79c6>=</span>
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>|</span> Uninitialized
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>|</span> Processing
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>|</span> Finished
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>|</span> WithError
+</span></span></code></pre></div><p><em>But anyways, lets go back to the main topic..</em></p><p>Our goal was to make the transition gradual, easy to understand, and capable of releasing small, well-contained migrations in production. Moving to Typescript was a game-changer and led the team towards safer and better-structured code. It became the driving theme for other improvements, including the adoption of domain-driven design.</p><p>I plan to write on domain-centric solutions alone, so I&rsquo;m not going in depth about it here, but in summary, it centralizes the development around it, using cool ideas such as bringing domain experts and developers close together using a common language, plus other stuff like bounded contexts.</p><p>At the time we didn&rsquo;t realize how impactful this would be, and the challenges that came with it.</p><p>Initially we split the project into different layers, this was important for separation of concerns. We had the Domain for views, models, dtos and mappers. The Infrastructure handled repositories, helpers and utils. The Application had basically the React screens and hooks.</p><p>However, instead of creating a Service layer, which is common in this type of layered architecture, we divided the screens into different files. The primary ones were Screen.tsx for HTML components, and ScreenService.tsx, a kind of hook/context provider that acted much like a service, orchestrating the flow. This gave us some flexibility and made maintenance easier.</p><blockquote><p>It&rsquo;s worth noting that the general design applied here is a mix of different patterns and, as such, does not concern itself with architectural purity or anything of the sort. DDD ultimately means the application is Domain-centric.</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-md data-lang=md><span style=display:flex><span><span style=font-weight:700># inside ./src
+</span></span></span><span style=display:flex><span><span style=font-weight:700></span>├── domain
+</span></span><span style=display:flex><span>	├── models
+</span></span><span style=display:flex><span>	├── dtos
+</span></span><span style=display:flex><span>	├── views
+</span></span><span style=display:flex><span>	└── mappers
+</span></span><span style=display:flex><span>├── infrastructure
+</span></span><span style=display:flex><span>	├── api
+</span></span><span style=display:flex><span>	└── utils
+</span></span><span style=display:flex><span>└── application
+</span></span><span style=display:flex><span>	└──  order
+</span></span><span style=display:flex><span>		├── components
+</span></span><span style=display:flex><span>		├── Order.tsx
+</span></span><span style=display:flex><span>		└── OrderService.tsx
+</span></span></code></pre></div><p>Second, we had to figure out how to write code that would allow for a smooth interaction between types from different layers. It&rsquo;s a bit different when you apply these concepts to the frontend, and some adjustments had to be made.</p><p>In essence, view types are flexible and used to hold user inputs; validation logic can usually be found close to them. Dto types are similar to view types, and serve as the contract between the application and external sources when fetching or sending data.</p><p>For these two layers to have a healthy interaction with the domain (in our case, at least), it was necessary to provide functionality to enable flows that need not the domain, to work seemlessly. Meaning, the creation of a new resource that has been validated already in the view layer, to be sent to the backend without friction.</p><p>&mldr;In any case, we arrived at something similar to this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=display:flex><span><span style=color:#6272a4>// Unique symbol used to make the construction of valid types impossible
+</span></span></span><span style=display:flex><span><span style=color:#6272a4>// without using the proper `validate` function.
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>const</span> modalitySymbol <span style=color:#ff79c6>=</span> Symbol(<span style=color:#f1fa8c>&#34;Modality&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>type</span> Modality <span style=color:#ff79c6>=</span> {
+</span></span><span style=display:flex><span>	[modalitySymbol]<span style=color:#ff79c6>:</span> <span style=color:#ff79c6>true</span> <span style=color:#6272a4>// the value here doesn&#39;t matter
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span>	name: <span style=color:#8be9fd>string</span>
+</span></span><span style=display:flex><span>	id: <span style=color:#8be9fd>string</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>function</span> createModality(modality: <span style=color:#8be9fd>ModalityDto</span>)<span style=color:#ff79c6>:</span> Modality {
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>if</span> (modality.id <span style=color:#ff79c6>===</span> <span style=color:#ff79c6>undefined</span> <span style=color:#ff79c6>||</span> modality.id.trim().length <span style=color:#ff79c6>===</span> <span style=color:#bd93f9>0</span>)
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>throw</span> <span style=color:#ff79c6>new</span> ValidationError({message: <span style=color:#8be9fd>ErrorMessages.cannotBeNullOrEmpty</span>(<span style=color:#f1fa8c>&#34;id&#34;</span>)})
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>return</span> {
+</span></span><span style=display:flex><span>		[modalitySymbol]<span style=color:#ff79c6>:</span> <span style=color:#ff79c6>true</span>,
+</span></span><span style=display:flex><span>		id: <span style=color:#8be9fd>modality.id</span>,
+</span></span><span style=display:flex><span>		name: <span style=color:#8be9fd>modality.name</span>,
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>// Exporting types and funcs at the end of the file
+</span></span></span><span style=display:flex><span><span style=color:#6272a4>// instead of using `export` in their definition is good for readability,
+</span></span></span><span style=display:flex><span><span style=color:#6272a4>// but also to avoid circular dependencies between modules.
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>export</span> <span style=color:#ff79c6>type</span> { Modality }
+</span></span><span style=display:flex><span><span style=color:#ff79c6>export</span> { createModality }
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=display:flex><span><span style=color:#ff79c6>type</span> ModalityDto <span style=color:#ff79c6>=</span> {
+</span></span><span style=display:flex><span>	id?: <span style=color:#8be9fd>string</span>;
+</span></span><span style=display:flex><span>	name: <span style=color:#8be9fd>string</span>;
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>export</span> <span style=color:#ff79c6>type</span> { ModalityDto };
+</span></span></code></pre></div><p>The mappers were written separately. We implemented mostly functions that mapped between domain and dto types. Some were also created to map from a view type to a dto (related to the necessity to avoid friction I mentioned earlier).</p><p>And mind you, this solution was practical, it allowed us to move forward with the changes, but there&rsquo;s still some polishing to do. I would like to achieve an organization similar to F# modules, something like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=display:flex><span><span style=color:#ff79c6>namespace</span> Modality {
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>namespace</span> Domain {
+</span></span><span style=display:flex><span>		<span style=color:#6272a4>// Unique symbol used to make the construction of valid types impossible
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span>		<span style=color:#6272a4>// without using the proper `validate` function.
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span>		<span style=color:#ff79c6>const</span> modalitySymbol <span style=color:#ff79c6>=</span> Symbol(<span style=color:#f1fa8c>&#34;Modality&#34;</span>);
+</span></span><span style=display:flex><span>		
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>type</span> Modality <span style=color:#ff79c6>=</span> {
+</span></span><span style=display:flex><span>			[modalitySymbol]<span style=color:#ff79c6>:</span> <span style=color:#ff79c6>true</span> <span style=color:#6272a4>// the value here doesn&#39;t matter
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span>			name: <span style=color:#8be9fd>string</span>
+</span></span><span style=display:flex><span>			id: <span style=color:#8be9fd>string</span>
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>export</span> <span style=color:#8be9fd;font-style:italic>function</span> create(modality: <span style=color:#8be9fd>Dto.Modality</span>)<span style=color:#ff79c6>:</span> Modality {
+</span></span><span style=display:flex><span>			<span style=color:#ff79c6>if</span> (modality.id <span style=color:#ff79c6>===</span> <span style=color:#ff79c6>undefined</span> <span style=color:#ff79c6>||</span> modality.id.trim().length <span style=color:#ff79c6>===</span> <span style=color:#bd93f9>0</span>)
+</span></span><span style=display:flex><span>				<span style=color:#ff79c6>throw</span> <span style=color:#ff79c6>new</span> ValidationError({message: <span style=color:#8be9fd>ErrorMessages.cannotBeNullOrEmpty</span>(<span style=color:#f1fa8c>&#34;id&#34;</span>)})
+</span></span><span style=display:flex><span>	
+</span></span><span style=display:flex><span>			<span style=color:#ff79c6>return</span> {
+</span></span><span style=display:flex><span>				[modalitySymbol]<span style=color:#ff79c6>:</span> <span style=color:#ff79c6>true</span>,
+</span></span><span style=display:flex><span>				id: <span style=color:#8be9fd>modality.id</span>,
+</span></span><span style=display:flex><span>				name: <span style=color:#8be9fd>modality.name</span>,
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>namespace</span> View {
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>type</span> Modality <span style=color:#ff79c6>=</span> {
+</span></span><span style=display:flex><span>			name?: <span style=color:#8be9fd>string</span>
+</span></span><span style=display:flex><span>			id?: <span style=color:#8be9fd>string</span>
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>export</span> <span style=color:#8be9fd;font-style:italic>function</span> toModel(modality: <span style=color:#8be9fd>Modality</span>) {}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>export</span> <span style=color:#8be9fd;font-style:italic>function</span> ofModel(modality: <span style=color:#8be9fd>Domain.Modality</span>) {}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>namespace</span> Dto {
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>export</span> <span style=color:#ff79c6>type</span> Modality <span style=color:#ff79c6>=</span> {
+</span></span><span style=display:flex><span>			name: <span style=color:#8be9fd>string</span>
+</span></span><span style=display:flex><span>			id?: <span style=color:#8be9fd>string</span>
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>export</span> <span style=color:#8be9fd;font-style:italic>function</span> toModel(modality: <span style=color:#8be9fd>Modality</span>) {}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>export</span> <span style=color:#8be9fd;font-style:italic>function</span> ofModel(modality: <span style=color:#8be9fd>Domain.Modality</span>) {}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>export</span> <span style=color:#ff79c6>default</span> Modality
+</span></span></code></pre></div><p>Having finished modeling the domain and other value object types, we were ready to design the repositories. For this purpose, we used OOP (<em>object oriented programming</em>) to define a base class responsible for implementing the essential code for communicating with the backend.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=display:flex><span><span style=color:#ff79c6>export</span> <span style=color:#ff79c6>default</span> <span style=color:#ff79c6>abstract</span> <span style=color:#ff79c6>class</span> BaseApi {
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>constructor</span>(apiAddress: <span style=color:#8be9fd>string</span>) {
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>this</span>.baseUrl <span style=color:#ff79c6>=</span> GetDomain() <span style=color:#ff79c6>+</span> apiAddress;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>private</span> <span style=color:#ff79c6>readonly</span> baseUrl: <span style=color:#8be9fd>string</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>protected</span> isResponseSuccessful(statusCode: <span style=color:#8be9fd>number</span>) {
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>if</span> ([<span style=color:#bd93f9>200</span>, <span style=color:#bd93f9>201</span>, <span style=color:#bd93f9>202</span>, <span style=color:#bd93f9>204</span>, <span style=color:#bd93f9>206</span>].includes(statusCode))
+</span></span><span style=display:flex><span>			<span style=color:#ff79c6>return</span> <span style=color:#ff79c6>true</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>return</span> <span style=color:#ff79c6>false</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>protected</span> <span style=color:#ff79c6>async</span> request&lt;<span style=color:#ff79c6>T</span>&gt;(
+</span></span><span style=display:flex><span>		uri: <span style=color:#8be9fd>string</span>,
+</span></span><span style=display:flex><span>		method: <span style=color:#8be9fd>HttpMethod</span>,
+</span></span><span style=display:flex><span>		body: <span style=color:#8be9fd>object</span> <span style=color:#ff79c6>|</span> <span style=color:#ff79c6>null</span> <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>null</span>
+</span></span><span style=display:flex><span>	)<span style=color:#ff79c6>:</span> Promise&lt;<span style=color:#ff79c6>AxiosResponse</span>&lt;<span style=color:#ff79c6>T</span>&gt;&gt; {
+</span></span><span style=display:flex><span>		<span style=color:#8be9fd;font-style:italic>let</span> req: <span style=color:#8be9fd>AxiosRequestConfig</span> <span style=color:#ff79c6>=</span> {
+</span></span><span style=display:flex><span>			baseURL: <span style=color:#8be9fd>this.baseUrl</span>,
+</span></span><span style=display:flex><span>			url: <span style=color:#8be9fd>uri</span>,
+</span></span><span style=display:flex><span>			method: <span style=color:#8be9fd>method</span>,
+</span></span><span style=display:flex><span>			headers<span style=color:#ff79c6>:</span> {}, <span style=color:#6272a4>// auth here if any
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span>			data: <span style=color:#8be9fd>body</span> <span style=color:#ff79c6>===</span> <span style=color:#ff79c6>null</span> <span style=color:#ff79c6>?</span> <span style=color:#ff79c6>null</span> <span style=color:#ff79c6>:</span> JSON.stringify(body),
+</span></span><span style=display:flex><span>		};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#8be9fd;font-style:italic>let</span> resp: <span style=color:#8be9fd>AxiosResponse</span>&lt;<span style=color:#ff79c6>T</span>&gt;;
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>try</span> {
+</span></span><span style=display:flex><span>			resp <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>await</span> Axios.request&lt;<span style=color:#ff79c6>T</span>&gt;(req);
+</span></span><span style=display:flex><span>		} <span style=color:#ff79c6>catch</span> (err: <span style=color:#8be9fd>unknown</span>) {
+</span></span><span style=display:flex><span>			<span style=color:#8be9fd;font-style:italic>let</span> axiosError <span style=color:#ff79c6>=</span> err <span style=color:#ff79c6>as</span> AxiosError&lt;<span style=color:#ff79c6>T</span>&gt;;
+</span></span><span style=display:flex><span>			<span style=color:#ff79c6>if</span> (
+</span></span><span style=display:flex><span>				axiosError<span style=color:#ff79c6>?</span>.isAxiosError <span style=color:#ff79c6>&amp;&amp;</span>
+</span></span><span style=display:flex><span>				axiosError<span style=color:#ff79c6>?</span>.response <span style=color:#ff79c6>!==</span> <span style=color:#ff79c6>null</span> <span style=color:#ff79c6>&amp;&amp;</span>
+</span></span><span style=display:flex><span>				axiosError<span style=color:#ff79c6>?</span>.response <span style=color:#ff79c6>!==</span> <span style=color:#ff79c6>undefined</span>
+</span></span><span style=display:flex><span>			) {
+</span></span><span style=display:flex><span>				resp <span style=color:#ff79c6>=</span> axiosError.response;
+</span></span><span style=display:flex><span>				<span style=color:#ff79c6>return</span> resp;
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>			<span style=color:#6272a4>// Rethrow error up the stack, we don&#39;t want to catch here
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span>			<span style=color:#6272a4>// because there are no errors expected besides AxiosError.
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span>			<span style=color:#ff79c6>throw</span> err;
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>return</span> resp;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Then, we inherited the BaseApi for any of our APIs.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=display:flex><span><span style=color:#ff79c6>interface</span> ISomeApi {
+</span></span><span style=display:flex><span>    getSomethingById<span style=color:#ff79c6>:</span> (id: <span style=color:#8be9fd>string</span>) <span style=color:#ff79c6>=&gt;</span> Promise&lt;<span style=color:#ff79c6>SomethingDto</span>&gt;;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>class</span> SomeApi <span style=color:#ff79c6>extends</span> BaseApi <span style=color:#ff79c6>implements</span> ISomeApi {
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>async</span> getSomethingById(id: <span style=color:#8be9fd>string</span>)<span style=color:#ff79c6>:</span> Promise&lt;<span style=color:#ff79c6>SomethingDto</span>&gt; {
+</span></span><span style=display:flex><span>        <span style=color:#8be9fd;font-style:italic>let</span> resp <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>await</span> <span style=color:#ff79c6>this</span>.request&lt;<span style=color:#ff79c6>SomethingDto</span>&gt;(<span style=color:#f1fa8c>`something/</span><span style=color:#f1fa8c>${</span>id<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>`</span>, HttpMethod.Get);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> (<span style=color:#ff79c6>!</span><span style=color:#ff79c6>this</span>.isResponseSuccessful(resp.status))
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>throw</span> <span style=color:#ff79c6>new</span> <span style=color:#8be9fd;font-style:italic>Error</span>(<span style=color:#f1fa8c>&#34;Could not get something by id.&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> resp.data;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>export</span> <span style=color:#ff79c6>const</span> someApi: <span style=color:#8be9fd>ISomeApi</span> <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>new</span> SomeApi(<span style=color:#f1fa8c>&#34;api/&#34;</span>);
+</span></span></code></pre></div><p>I&rsquo;m still debating on whether we should have written the repositories in the same namespaces as the domain entities, creating nice bounded contexts, or if the application would struggle to handle such tight structures.</p><p>Anyhow, that can change in the future.</p><p>With the Infrastructure layer now in place, we could finally wrap it all up in the services. These services would be responsible for orchestrating the flow of data and business logic between the user interface and the repositories.</p><p>Here&rsquo;s an example of service, which in our case is just a React hook:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=display:flex><span><span style=color:#ff79c6>export</span> <span style=color:#ff79c6>default</span> <span style=color:#8be9fd;font-style:italic>function</span> someService() {
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>const</span> [something, setSomething] <span style=color:#ff79c6>=</span> useState&lt;<span style=color:#ff79c6>SomethingView</span>&gt;({});
+</span></span><span style=display:flex><span>	
+</span></span><span style=display:flex><span>	useEffect(() <span style=color:#ff79c6>=&gt;</span> {
+</span></span><span style=display:flex><span>		getSomething(sellerId);
+</span></span><span style=display:flex><span>	}, []);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>const</span> getSomething <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>async</span> (id: <span style=color:#8be9fd>string</span>)<span style=color:#ff79c6>:</span> Promise&lt;<span style=color:#ff79c6>void</span>&gt; <span style=color:#ff79c6>=&gt;</span> {
+</span></span><span style=display:flex><span>		setIsLoading(<span style=color:#ff79c6>true</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#ff79c6>try</span> {
+</span></span><span style=display:flex><span>			<span style=color:#8be9fd;font-style:italic>let</span> data: <span style=color:#8be9fd>SomethingDto</span> <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>await</span> someApi.getSomethingById(id);
+</span></span><span style=display:flex><span>			<span style=color:#8be9fd;font-style:italic>let</span> domainObj <span style=color:#ff79c6>=</span> createModality(data);
+</span></span><span style=display:flex><span>			<span style=color:#6272a4>// Do some business logic here using domainObj..
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span>			<span style=color:#8be9fd;font-style:italic>let</span> viewObj <span style=color:#ff79c6>=</span> ModalityMapper.toView(domainObj);
+</span></span><span style=display:flex><span>			setModalities(viewObj);
+</span></span><span style=display:flex><span>		} <span style=color:#ff79c6>catch</span> {
+</span></span><span style=display:flex><span>			ToastComponent({
+</span></span><span style=display:flex><span>				status<span style=color:#ff79c6>:</span> <span style=color:#f1fa8c>&#34;error&#34;</span>,
+</span></span><span style=display:flex><span>				title<span style=color:#ff79c6>:</span> <span style=color:#f1fa8c>&#34;Some error :(&#34;</span>,
+</span></span><span style=display:flex><span>				message<span style=color:#ff79c6>:</span> <span style=color:#f1fa8c>&#34;Something could not be loaded&#34;</span>,
+</span></span><span style=display:flex><span>			});
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		setTimeout(() <span style=color:#ff79c6>=&gt;</span> {
+</span></span><span style=display:flex><span>			setIsLoading(<span style=color:#ff79c6>false</span>);
+</span></span><span style=display:flex><span>		}, <span style=color:#bd93f9>500</span>);
+</span></span><span style=display:flex><span>	};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#ff79c6>return</span> {
+</span></span><span style=display:flex><span>		<span style=color:#6272a4>// Props
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span>		something,
+</span></span><span style=display:flex><span>		isLoading,
+</span></span><span style=display:flex><span>		<span style=color:#6272a4>// Functions
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span>		getSomething,
+</span></span><span style=display:flex><span>	};
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>At this point I&rsquo;ve summarized pretty much all the relevant events, and omitted many of others, like our attempts to use external packages to validate forms, which we didn&rsquo;t enjoy very much, and the migration from bootstrap to MUI; but those are reserved for another day..</p><p>For now, that&rsquo;s what I have to share about introducing domain-driven design to a frontend application.</p><hr><p>As for the results that blossomed from this adventure, I can&rsquo;t share much in details, but there&rsquo;s one that is special to me. The amount of bugs that were escalated for fix, which were noticeable previously to these changes, have now resumed in, believe it or not, zero (statistics from the three months after first release in production).</p><p>In conclusion, transitioning from Javascript to Typescript, as well as writing code driven by the domain, have provided just enough strictness to create a safer, faster, and more enjoyable development cycle for the frontend team. It was an extremely enriching and rewarding experience, and I recommend other teams to dare explore!</p></div><footer class=post-footer><div class=post-lastmod><time datetime=2023-07-23T19:38:30-03:00>update @ July 23, 2023</time><p></p></div><div class=post-tags><i class="fas fa-tags"></i>
 <a href=/tags/english>English</a>
-&nbsp;
-</div>
-<div class=related-posts>
-<h4>Related Posts</h4>
-<i class="fas fa-paperclip"></i>
-<a href=/posts/8a79bd9f/>An insight into beautiful code</a>
-<br>
-</div>
-</footer>
-<div class=comments>
-<div class=comments>
-</div>
-</div>
-</article>
-<div class=foot>
-&copy; 2019 - 2025 &#183;
-<a href=/> dasein </a> &#183;
+&nbsp;</div><div class=related-posts><h4>Related Posts</h4><i class="fas fa-paperclip"></i>
+<a href=/posts/8a79bd9f/>An insight into beautiful code</a><br></div></footer><div class=comments><div class=comments></div></div></article><div class=foot>&copy; 2019 - 2025 &#183;
+<a href=/>dasein </a>&#183;
 Powered by <a href=https://gohugo.io/>Hugo</a> &#183;
-<a href=#><i class="fas fa-chevron-up"></i></a>
-</div>
-</body>
-<script src=/js/lazyload.min.js></script>
-<script>var lazyImage=new LazyLoad({container:document.getElementById('article')})</script>
-</html>
+<a href=#><i class="fas fa-chevron-up"></i></a></div></body><script src=/js/lazyload.min.js></script><script>var lazyImage=new LazyLoad({container:document.getElementById("article")})</script></html>

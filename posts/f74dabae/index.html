@@ -1,0 +1,111 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=generator content="Hugo 0.147.3"><title>Designing a database interface with postgres schemas | dasein </title><meta name=description content="In this post I describe how I designed a database interface using postgres schemas and functions"><link rel=stylesheet href=https://dasein.dev/css/style.css><link rel=canonical href=https://dasein.dev/posts/f74dabae/><link rel=alternate type=application/rss+xml href title=dasein><link href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css rel=stylesheet></head><body class=container><nav class=navigation><div class=nav-left><div class="nav-item nav-title"><a href=https://dasein.dev/>dasein</a></div><div class="nav-item nav-menu"><a href=/>Home</a>
+<a href=/about/>About</a>
+<a href=/categories/>Categories</a>
+<a href=/tags/>Tags</a></div></div><div class="nav-item nav-right fontawesome"><a href=https://github.com/d4sein/ target=_blank><i title=GitHub class="fab fa-github"></i>
+</a><a href=https://dasein.dev/index.xml target=_blank><i title=RSS class="fas fa-rss"></i></a></div></nav><article class=post><header class=post-header><h1 style=text-align:center>Designing a database interface with postgres schemas</h1><div class=post-metadata><time datetime=2025-05-18T04:56:12-03:00>May 18, 2025</time> &nbsp;
+<i class="far fa-clock"></i>
+3 min
+7 s
+&nbsp;
+<i class="fas fa-folder"></i>
+<a href=/categories/programming>Programming</a>
+&nbsp;</div></header><div class=post-text><p><img src=/../imgs/Military-Art-Italy-097.jpg alt></p><p>I&rsquo;m currently working on a project — a highly customizable logbook with analytics tools — and part of the design process was defining the communication between my app and the database.</p><p>I wanted to apply some ideas I&rsquo;ve been cooking for a while and that I don&rsquo;t see very often in the industry, that is using schemas for separation of concerns and functions for the contracts. This setup provides a clear interface while omitting implementation details, <em>which is what we do in everything else, right?</em></p><blockquote><p>Disclaimer: This concept is nothing new and PostgREST offers a similar solution.</p></blockquote><p>First, I created my schemas, the <code>app_user</code> role, and set the permissions. My current setup has four custom schemas, each with a specific responsibility:</p><ul><li><code>core</code> is where all tables related to the business are created; the heart of the database.</li><li><code>api</code> is where all functions related to the interface are created; effectively, this is the only schema my <code>app_user</code> can see.</li><li><code>internal</code> is where I usually keep utility functions.</li><li><code>checks</code> is a nice way to organize validation functions that return a Boolean; those can be used for business validation inside a function, or in a check constraint.</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sql data-lang=sql><span style=display:flex><span><span style=color:#ff79c6>BEGIN</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>-- Create the four core schemas
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>CREATE</span> <span style=color:#ff79c6>SCHEMA</span> <span style=color:#ff79c6>IF</span> <span style=color:#ff79c6>NOT</span> <span style=color:#ff79c6>EXISTS</span> core;
+</span></span><span style=display:flex><span><span style=color:#ff79c6>CREATE</span> <span style=color:#ff79c6>SCHEMA</span> <span style=color:#ff79c6>IF</span> <span style=color:#ff79c6>NOT</span> <span style=color:#ff79c6>EXISTS</span> api;
+</span></span><span style=display:flex><span><span style=color:#ff79c6>CREATE</span> <span style=color:#ff79c6>SCHEMA</span> <span style=color:#ff79c6>IF</span> <span style=color:#ff79c6>NOT</span> <span style=color:#ff79c6>EXISTS</span> internal;
+</span></span><span style=display:flex><span><span style=color:#ff79c6>CREATE</span> <span style=color:#ff79c6>SCHEMA</span> <span style=color:#ff79c6>IF</span> <span style=color:#ff79c6>NOT</span> <span style=color:#ff79c6>EXISTS</span> checks;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>-- Replace &#39;supersecurepassword&#39; with your real secret
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>CREATE</span> <span style=color:#ff79c6>ROLE</span> app_user LOGIN PASSWORD <span style=color:#f1fa8c>&#39;supersecurepassword&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>-- Revoke ALL access from PUBLIC (i.e., all users) on all custom schemas
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>REVOKE</span> <span style=color:#ff79c6>ALL</span> <span style=color:#ff79c6>ON</span> <span style=color:#ff79c6>SCHEMA</span> core, api, internal, checks <span style=color:#ff79c6>FROM</span> <span style=color:#ff79c6>PUBLIC</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>-- Revoke all privileges on tables and functions (applies to existing objects)
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>REVOKE</span> <span style=color:#ff79c6>ALL</span> <span style=color:#ff79c6>ON</span> <span style=color:#ff79c6>ALL</span> TABLES <span style=color:#ff79c6>IN</span> <span style=color:#ff79c6>SCHEMA</span> core, internal, api, checks <span style=color:#ff79c6>FROM</span> <span style=color:#ff79c6>PUBLIC</span>;
+</span></span><span style=display:flex><span><span style=color:#ff79c6>REVOKE</span> <span style=color:#ff79c6>ALL</span> <span style=color:#ff79c6>ON</span> <span style=color:#ff79c6>ALL</span> FUNCTIONS <span style=color:#ff79c6>IN</span> <span style=color:#ff79c6>SCHEMA</span> core, internal, api, checks <span style=color:#ff79c6>FROM</span> <span style=color:#ff79c6>PUBLIC</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>---------------------------------------------------------------------------------
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>GRANT</span> <span style=color:#ff79c6>USAGE</span> <span style=color:#ff79c6>ON</span> <span style=color:#ff79c6>SCHEMA</span> api <span style=color:#ff79c6>TO</span> app_user;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>-- One-off grants for existing objects
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>GRANT</span> <span style=color:#ff79c6>SELECT</span>
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>ON</span> <span style=color:#ff79c6>ALL</span> TABLES <span style=color:#ff79c6>IN</span> <span style=color:#ff79c6>SCHEMA</span> api
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>TO</span> app_user;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>GRANT</span> <span style=color:#ff79c6>EXECUTE</span>
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>ON</span> <span style=color:#ff79c6>ALL</span> FUNCTIONS <span style=color:#ff79c6>IN</span> <span style=color:#ff79c6>SCHEMA</span> api
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>TO</span> app_user;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>-- Default privileges for future objects
+</span></span></span><span style=display:flex><span><span style=color:#6272a4>-- Obs: you should have a user with privileges such as api_owner for this.
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>ALTER</span> <span style=color:#ff79c6>DEFAULT</span> <span style=color:#ff79c6>PRIVILEGES</span> <span style=color:#ff79c6>FOR</span> <span style=color:#ff79c6>ROLE</span> api_owner
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>IN</span> <span style=color:#ff79c6>SCHEMA</span> api
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>GRANT</span> <span style=color:#ff79c6>SELECT</span> <span style=color:#ff79c6>ON</span> TABLES <span style=color:#ff79c6>TO</span> app_user;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>ALTER</span> <span style=color:#ff79c6>DEFAULT</span> <span style=color:#ff79c6>PRIVILEGES</span> <span style=color:#ff79c6>FOR</span> <span style=color:#ff79c6>ROLE</span> api_owner
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>IN</span> <span style=color:#ff79c6>SCHEMA</span> api
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>GRANT</span> <span style=color:#ff79c6>EXECUTE</span> <span style=color:#ff79c6>ON</span> FUNCTIONS <span style=color:#ff79c6>TO</span> app_user;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>COMMIT</span>;
+</span></span></code></pre></div><p>With this setup, I then proceeded to create internal functions like a snowflake_id generator, and the tables for the system.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sql data-lang=sql><span style=display:flex><span><span style=color:#ff79c6>BEGIN</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>-- I&#39;m omitting the def of generate_snowflake_id
+</span></span></span><span style=display:flex><span><span style=color:#6272a4>-- and workout table for the sake of brevity
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>CREATE</span> <span style=color:#ff79c6>TABLE</span> core.exercise (
+</span></span><span style=display:flex><span>    exercise_id <span style=color:#8be9fd;font-style:italic>BIGINT</span> <span style=color:#ff79c6>DEFAULT</span> internal.generate_snowflake_id() <span style=color:#ff79c6>PRIMARY</span> <span style=color:#ff79c6>KEY</span>,
+</span></span><span style=display:flex><span>	workout_id <span style=color:#8be9fd;font-style:italic>BIGINT</span> <span style=color:#ff79c6>NOT</span> <span style=color:#ff79c6>NULL</span> <span style=color:#ff79c6>REFERENCES</span> core.workout(workout_id) <span style=color:#ff79c6>ON</span> <span style=color:#ff79c6>DELETE</span> <span style=color:#ff79c6>CASCADE</span>,
+</span></span><span style=display:flex><span>    exercise_name <span style=color:#8be9fd;font-style:italic>VARCHAR</span>(<span style=color:#bd93f9>100</span>) <span style=color:#ff79c6>NOT</span> <span style=color:#ff79c6>NULL</span>
+</span></span><span style=display:flex><span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>COMMIT</span>;
+</span></span></code></pre></div><p>You could add the schema names to the global <code>search_path</code>, but I prefer to fully qualify them; it makes it easier to identify which schema each component belongs to.</p><p>For the API, I created functions for the operations I needed on a given resource.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sql data-lang=sql><span style=display:flex><span><span style=color:#ff79c6>BEGIN</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>-- API/CREATE_EXERCISE
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>CREATE</span> <span style=color:#ff79c6>OR</span> <span style=color:#ff79c6>REPLACE</span> <span style=color:#ff79c6>FUNCTION</span> api.create_exercise(
+</span></span><span style=display:flex><span>  p_workout_id     <span style=color:#8be9fd;font-style:italic>BIGINT</span>,
+</span></span><span style=display:flex><span>  p_exercise_name  <span style=color:#8be9fd;font-style:italic>TEXT</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span><span style=color:#ff79c6>RETURNS</span> <span style=color:#8be9fd;font-style:italic>BIGINT</span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>LANGUAGE</span> <span style=color:#ff79c6>sql</span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>SECURITY</span> <span style=color:#ff79c6>DEFINER</span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>VOLATILE</span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>SET</span> search_path <span style=color:#ff79c6>=</span> api, core, pg_temp
+</span></span><span style=display:flex><span><span style=color:#ff79c6>AS</span> $$
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>INSERT</span> <span style=color:#ff79c6>INTO</span> core.exercise (workout_id, exercise_name)
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>VALUES</span> (p_workout_id, p_exercise_name)
+</span></span><span style=display:flex><span>  RETURNING exercise_id;
+</span></span><span style=display:flex><span>$$;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>-- API/GET_EXERCISE_LIST
+</span></span></span><span style=display:flex><span><span style=color:#6272a4></span><span style=color:#ff79c6>CREATE</span> <span style=color:#ff79c6>OR</span> <span style=color:#ff79c6>REPLACE</span> <span style=color:#ff79c6>FUNCTION</span> api.get_exercise_list(
+</span></span><span style=display:flex><span>  p_workout_id <span style=color:#8be9fd;font-style:italic>BIGINT</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span><span style=color:#ff79c6>RETURNS</span> <span style=color:#ff79c6>TABLE</span> (
+</span></span><span style=display:flex><span>  exercise_id   <span style=color:#8be9fd;font-style:italic>BIGINT</span>,
+</span></span><span style=display:flex><span>  exercise_name <span style=color:#8be9fd;font-style:italic>TEXT</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span><span style=color:#ff79c6>LANGUAGE</span> <span style=color:#ff79c6>sql</span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>SECURITY</span> <span style=color:#ff79c6>DEFINER</span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>STABLE</span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>SET</span> search_path <span style=color:#ff79c6>=</span> api, core, pg_temp
+</span></span><span style=display:flex><span><span style=color:#ff79c6>AS</span> $$
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>SELECT</span> exercise_id, exercise_name
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>FROM</span> core.exercise
+</span></span><span style=display:flex><span>  <span style=color:#ff79c6>WHERE</span> workout_id <span style=color:#ff79c6>=</span> p_workout_id;
+</span></span><span style=display:flex><span>$$;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>COMMIT</span>;
+</span></span></code></pre></div><p>And that&rsquo;s it! Now I have a clean interface that my application can consume from, which doesn&rsquo;t leak any implementation details, improves code versioning, facilitates changes to business rules in real time, and has a safer environment for production.</p><p>Important notes:</p><ul><li><code>SECURITY DEFINER</code> specifies that the function is to be executed with the privileges of the user that owns it, which is necessary for functions to access other schemas. Read it more here on how to do this safely: <a href=https://www.postgresql.org/docs/current/sql-createfunction.html#SQL-CREATEFUNCTION-SECURITY>https://www.postgresql.org/docs/current/sql-createfunction.html#SQL-CREATEFUNCTION-SECURITY</a></li><li>Read functions can be <code>STABLE</code>; write functions must be <code>VOLATILE</code>.</li><li>If you update your tables, the functions will not update automatically. You might want to look into migration tools like Flyway to mitigate this problem.</li></ul></div><footer class=post-footer><div class=post-tags><i class="fas fa-tags"></i>
+<a href=/tags/english>English</a>
+&nbsp;</div><div class=related-posts><h4>Related Posts</h4><i class="fas fa-paperclip"></i>
+<a href=/posts/b22d646e/>Exhaustive pattern matching in C#</a><br><i class="fas fa-paperclip"></i>
+<a href=/posts/409fe13d/>My introduction to Euclid's Elements: Book I</a><br><i class="fas fa-paperclip"></i>
+<a href=/posts/e9c2ce81/>Wrapping C# types with actual domain specific knowledge</a><br><i class="fas fa-paperclip"></i>
+<a href=/posts/eb18da4e/>Introducing domain-driven design to a frontend application</a><br><i class="fas fa-paperclip"></i>
+<a href=/posts/8a79bd9f/>An insight into beautiful code</a><br></div></footer><div class=comments><div class=comments></div></div></article><div class=foot>&copy; 2019 - 2025 &#183;
+<a href=/>dasein </a>&#183;
+Powered by <a href=https://gohugo.io/>Hugo</a> &#183;
+<a href=#><i class="fas fa-chevron-up"></i></a></div></body><script src=/js/lazyload.min.js></script><script>var lazyImage=new LazyLoad({container:document.getElementById("article")})</script></html>
